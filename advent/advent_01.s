@@ -22,18 +22,7 @@ advent_01:
     stp x19, x20, [sp, #-16]!
     stp x21, x22, [sp, #-16]!
     
-    adrp x0, file@PAGE
-    add x0, x0, file@PAGEOFF
-    mov x1, 'r'
-    bl open_file
-    
-    bl read_entire_file
-    mov x19, x0
-    bl num_lines_in_str
-
-    mov x1, x0   //x1: num_lines
-    mov x0, x19  //x0: file_data
-    bl load_advent_data
+    bl load_advent_data_from_file
 
     mov x19, x0 // left_arr_p
     mov x20, x1 // num_elements
@@ -57,6 +46,33 @@ advent_01:
     ldp x19, x20, [sp], #16
     ldp x29, x30, [sp], #16
     ret
+
+
+/*
+    struct { int* left_arr_p; int num_elements; } arr;
+    struct { arr* left_arr; arr* right_arr; } load_advent_data();
+ */
+load_advent_data_from_file:
+    stp x29, x30, [sp, #-16]!
+    stp x19, x20, [sp, #-16]!
+    
+    adrp x0, advent_file@PAGE
+    add x0, x0, advent_file@PAGEOFF
+    mov x1, 'r'
+    bl open_file
+    
+    bl read_entire_file
+    mov x19, x0
+    bl num_lines_in_str
+
+    mov x1, x0   //x1: num_lines
+    mov x0, x19  //x0: file_data
+    bl load_advent_data
+
+    ldp x19, x20, [sp], #16
+    ldp x29, x30, [sp], #16
+    ret
+
 
 /*
     int calculate_difference(int* left_arr, int* right_arr, int num_elements);
@@ -203,7 +219,7 @@ load_advent_data:
 .section __DATA,__data
 .align 2
 
-file: 
+advent_file: 
     .ascii "advent/advent_01.txt\0"
 
 .set __ADVENT_01_S__, 1
